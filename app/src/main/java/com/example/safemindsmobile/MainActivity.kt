@@ -1,6 +1,7 @@
 package com.example.safemindsmobile
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,16 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.safemindsmobile.data.receiver.WearMessageManager
 import com.example.safemindsmobile.ui.theme.SafeMindsMobileTheme
+import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.Wearable
 
 class MainActivity : ComponentActivity() {
-    private lateinit var wearMessageManager: WearMessageManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        wearMessageManager = WearMessageManager(this)
 
         setContent {
             SafeMindsMobileTheme {
@@ -28,21 +28,14 @@ class MainActivity : ComponentActivity() {
 
             }
         }
+        Wearable.getCapabilityClient(this)
+            .getAllCapabilities(CapabilityClient.FILTER_ALL)
+            .addOnSuccessListener { capabilities ->
+                capabilities.forEach { (name, info) ->
+                    Log.d("CAP_TEST", "Capability: $name, nodes=${info.nodes.size}")
+                }
+            }
     }
-
-    override fun onStart() {
-        super.onStart()
-        wearMessageManager.start()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        wearMessageManager.stop()
-    }
-
-
-
-
 
     @Composable
     fun SafeMindsMobile(){
