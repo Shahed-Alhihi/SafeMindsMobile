@@ -1,49 +1,39 @@
 package com.example.safemindsmobile.ui.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MovableContent
-import androidx.compose.ui.platform.LocalContext
 private val LightColors = lightColorScheme(
     primary = primaryColor,
+    onPrimary = onPrimaryColor,
+
     secondary = secondaryColor,
-    tertiary = primaryHelper,
-    onSecondaryContainer = secondaryHelper,
+    onSecondary = onSurfaceColor,
+
 
     background = backgroundColor,
-    surface = backgroundHelper,
-    surfaceVariant = SurfaceVariant,
+    onBackground = onBackgroundColor,
 
 
-    onPrimary = textPrimary,
-    onSecondary = textSecondary,
-    error=errorColor
+    surface = surfaceColor,
+    onSurface = onSurfaceColor,
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+
+    surfaceVariant = surfaceVariantColor,
+    onSurfaceVariant = onSurfaceVariantColor,
+
+    //state
+    error=errorColor,
+    onError = onPrimaryColor
 )
 
 private val SafeMindsShapes= Shapes(
-    small= RoundedCornerShape(Spaces.smallAngil),
-    medium= RoundedCornerShape(Spaces.MedAngil),
-    large= RoundedCornerShape(Spaces.LargeAngil),
-    extraLarge=RoundedCornerShape(Spaces.XLAngil)
+    small= RoundedCornerShape(Radius.small),
+    medium= RoundedCornerShape(Radius.medium),
+    large= RoundedCornerShape(Radius.large),
+    extraLarge=RoundedCornerShape(Radius.xlarge)
 )
 
 @Composable

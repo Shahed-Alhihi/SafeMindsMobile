@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.safemindsmobile.navigation.AppNavFlow
 import com.example.safemindsmobile.ui.theme.SafeMindsMobileTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,15 +21,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SafeMindsMobileTheme {
-                SafeMindsMobile()
+
+                val navController= rememberNavController()
+                AppNavFlow(controller =navController)
 
             }
         }
-    }
-
-    @Composable
-    fun SafeMindsMobile(){
-        Text("Safe Minds")
     }
 }
 

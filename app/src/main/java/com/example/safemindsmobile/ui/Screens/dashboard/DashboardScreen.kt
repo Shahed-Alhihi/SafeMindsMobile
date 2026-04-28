@@ -1,4 +1,8 @@
 package com.example.safemindsmobile.ui.Screens.dashboard
 
-class DashboardScreen {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun DashboardScreen (){
 }
+
