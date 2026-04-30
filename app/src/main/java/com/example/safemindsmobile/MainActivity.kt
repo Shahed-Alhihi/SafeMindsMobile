@@ -13,8 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.safemindsmobile.ui.theme.SafeMindsMobileTheme
-import com.google.android.gms.wearable.CapabilityClient
-import com.google.android.gms.wearable.Wearable
+
 
 class MainActivity : ComponentActivity() {
 
@@ -27,14 +26,8 @@ class MainActivity : ComponentActivity() {
                 SafeMindsMobile()
 
             }
+
         }
-        Wearable.getCapabilityClient(this)
-            .getAllCapabilities(CapabilityClient.FILTER_ALL)
-            .addOnSuccessListener { capabilities ->
-                capabilities.forEach { (name, info) ->
-                    Log.d("CAP_TEST", "Capability: $name, nodes=${info.nodes.size}")
-                }
-            }
     }
 
     @Composable
