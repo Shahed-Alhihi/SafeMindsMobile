@@ -1,10 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+
+
 }
 
 android {
     namespace = "com.example.safemindsmobile"
+
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.safemindsmobile"
+        applicationId = "com.safeminds.watch"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -46,6 +50,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
+   // implementation(libs.play.services.wearable)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,4 +67,18 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+
+    implementation("com.google.android.gms:play-services-wearable:18.2.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+
+
+
 }
