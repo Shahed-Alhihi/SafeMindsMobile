@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
-import com.example.safemindsmobile.ui.Screens.onBoarding.AwarenessScreen
-import com.example.safemindsmobile.ui.Screens.onBoarding.EntryScreen
-import com.example.safemindsmobile.ui.Screens.onBoarding.InsightsScreen
-import com.example.safemindsmobile.ui.Screens.onBoarding.SupportScreen
-import com.example.safemindsmobile.ui.Screens.MainScreen
-import com.example.safemindsmobile.ui.Screens.pairing.PairWithWatch
-import com.example.safemindsmobile.ui.Screens.userCredentials.LoginScreen
-import com.example.safemindsmobile.ui.Screens.userCredentials.SignUpScreen
+import com.example.safemindsmobile.ui.screens.onBoarding.AwarenessScreen
+import com.example.safemindsmobile.ui.screens.onBoarding.EntryScreen
+import com.example.safemindsmobile.ui.screens.onBoarding.InsightsScreen
+import com.example.safemindsmobile.ui.screens.onBoarding.SupportScreen
+import com.example.safemindsmobile.ui.screens.MainScreen
+import com.example.safemindsmobile.ui.screens.pairing.PairWithWatch
+import com.example.safemindsmobile.ui.screens.userCredentials.LoginScreen
+import com.example.safemindsmobile.ui.screens.userCredentials.SignUpScreen
 
 //App navigation (outer nav controller)
 @Composable
@@ -49,7 +49,7 @@ fun AppNavFlow (
             LoginScreen(controller)
         }
         composable(AppScreens.Main.flow){
-            MainScreen()
+            MainScreen(controller)
         }
 
 

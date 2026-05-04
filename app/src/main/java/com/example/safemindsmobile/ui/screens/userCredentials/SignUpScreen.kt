@@ -1,4 +1,4 @@
-package com.example.safemindsmobile.ui.Screens.userCredentials
+package com.example.safemindsmobile.ui.screens.userCredentials
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,13 +41,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.Buttons.SafeMindsPrimaryButtons
+import com.example.safemindsmobile.ui.components.buttons.SafeMindsPrimaryButtons
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.primaryColor
 

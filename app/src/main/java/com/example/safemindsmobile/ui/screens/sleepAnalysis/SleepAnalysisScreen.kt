@@ -1,9 +1,10 @@
-package com.example.safemindsmobile.ui.Screens.sleepAnalysis
+package com.example.safemindsmobile.ui.screens.sleepAnalysis
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,11 +23,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Bedtime
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,51 +38,31 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.safemindsmobile.ui.components.AppIndicators.SectionHeader
-import com.example.safemindsmobile.ui.components.Cards.SafeMindsCard
+import androidx.navigation.NavController
+import com.example.safemindsmobile.R
+import com.example.safemindsmobile.data.model.SleepData
+import com.example.safemindsmobile.data.model.Day
+import com.example.safemindsmobile.data.model.sleepRecommendationType
+import com.example.safemindsmobile.data.model.RecommendationContent
+
+import com.example.safemindsmobile.navigation.AppScreens
+import com.example.safemindsmobile.ui.components.appIndicators.SectionHeader
+import com.example.safemindsmobile.ui.components.cards.SafeMindsCard
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.highRiskColor
 import com.example.safemindsmobile.ui.theme.primaryColor
 import com.example.safemindsmobile.ui.theme.successColor
 import com.example.safemindsmobile.ui.theme.warningColor
 
-class SleepData(
-    val sleepScore: Int,
-    val sleepDuration: String,
-    val sleepQuality: String,
-    val sleepEfficiency: String,
-    val sleepFragmentation: String,
-    val weekData: List<Day>,
-    val recommendations: List<RecommendationContent>
-
-)
-
-data class Day(
-    val day: String,
-    val hours:Float,
-    val efficiency: Int,
-    val maxHours: Float=9f
-)
-
-enum class RecommendationType{
-    LOW_RISK,
-    MEDIUM_RISK,
-    HIGH_RISK,
-    INFO
-}
-
-data class RecommendationContent(
-    val type:RecommendationType,
-    val title: String,
-    val description: String
-)
-
 @Composable
 fun SleepAnalysisScreen (
     data: SleepData
+    ,
+    navController: NavController
 ){
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -91,7 +70,7 @@ fun SleepAnalysisScreen (
             .padding(bottom = Spaces.spaceL),
         verticalArrangement = Arrangement.spacedBy(Spaces.spaceL)
     ) {
-        header()
+        header(navController)
 
         sleepScore(
             sleepScore=data.sleepScore,
@@ -120,7 +99,7 @@ fun SleepAnalysisScreen (
 
         data.recommendations.forEach{
             recommendation ->
-            sleepRecommendition(
+            sleepRecommendation(
                 recommendation=recommendation
             )
         }
@@ -128,40 +107,70 @@ fun SleepAnalysisScreen (
 
     }
 }
+
+
 @Composable
-private fun header(){
+private fun header(
+    navController: NavController
+){
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(top=Spaces.spaceM),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spaces.spaceS)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(MaterialTheme.shapes.small)
-                .background(primaryColor.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center
-        ){
-            Icon(
-                imageVector = Icons.Outlined.Bedtime,
-                contentDescription = null,
-                tint = primaryColor,
-                modifier = Modifier.size(23.dp)
-            )
-        }
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
 
-        Column {
-            Text(
-                text = "Sleep Analysis",
-                style= MaterialTheme.typography.headlineMedium,
-                color= MaterialTheme.colorScheme.onBackground
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spaces.spaceS)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
             )
+            {
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = "SafeMinds logo",
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+
+            Column {
+                Text(
+                    text = "SafeMinds",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "Sleep Analysis",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Text(
+                    text="Overall sleep quality",
+                    style= MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+            }
+        }
+        TextButton(onClick = {
+            navController.navigate(AppScreens.LoginScreen.flow) {
+                popUpTo(AppScreens.Main.flow){
+                    inclusive=true
+                }
+                launchSingleTop=true
+            }
+        }) {
             Text(
-                text="Overall sleep quality",
-                style= MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = "Logout",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -399,7 +408,7 @@ private fun item(
 
 
 @Composable
-private fun sleepRecommendition(
+private fun sleepRecommendation(
     recommendation: RecommendationContent
 ){
     var trigger by remember { mutableStateOf(false) }
@@ -469,13 +478,13 @@ private fun sleepEfficiencyColor(efficiency: Int): Color {
 
 
 private fun recommendationColor(
-    type: RecommendationType
+    type: sleepRecommendationType
 ): Color{
     return when (type) {
-        RecommendationType.LOW_RISK -> successColor
-        RecommendationType.MEDIUM_RISK -> warningColor
-        RecommendationType.HIGH_RISK -> highRiskColor
-        RecommendationType.INFO -> primaryColor
+        sleepRecommendationType.LOW_RISK -> successColor
+        sleepRecommendationType.MEDIUM_RISK -> warningColor
+        sleepRecommendationType.HIGH_RISK -> highRiskColor
+        sleepRecommendationType.INFO -> primaryColor
     }
 
 }

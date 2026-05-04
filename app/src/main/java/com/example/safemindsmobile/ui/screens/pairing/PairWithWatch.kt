@@ -1,4 +1,4 @@
-package com.example.safemindsmobile.ui.Screens.pairing
+package com.example.safemindsmobile.ui.screens.pairing
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -11,7 +11,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +31,6 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material.icons.outlined.Watch
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,16 +43,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.example.safemindsmobile.R
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.Buttons.SafeMindsPrimaryButtons
-import com.example.safemindsmobile.ui.components.Buttons.SafeMindsSecButtons
+import com.example.safemindsmobile.ui.components.buttons.SafeMindsPrimaryButtons
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.highRiskColor
 import com.example.safemindsmobile.ui.theme.primaryColor
@@ -63,11 +55,11 @@ import com.example.safemindsmobile.ui.theme.successColor
 import com.example.safemindsmobile.ui.theme.warningColor
 
 
-sealed interface pairWatchStates{
-    data object initialState: pairWatchStates
-    data object loading: pairWatchStates
-    data object success: pairWatchStates
-    data class failure(val messg: String): pairWatchStates
+sealed interface PairWatchStates{
+    data object InitialState: PairWatchStates
+    data object Loading: PairWatchStates
+    data object Success: PairWatchStates
+    data class Failure(val messg: String): PairWatchStates
 
 }
 @Composable
@@ -84,7 +76,7 @@ fun PairWithWatch (navController: NavHostController,
 
 
 ) {
-    var states by remember { mutableStateOf<pairWatchStates>(pairWatchStates.initialState) }
+    var states by remember { mutableStateOf<PairWatchStates>(PairWatchStates.InitialState) }
 
     Box(
         modifier = Modifier
@@ -150,17 +142,17 @@ fun PairWithWatch (navController: NavHostController,
                     verticalArrangement = Arrangement.spacedBy(Spaces.spaceS)
                 ) {
                     when (state) {
-                        pairWatchStates.initialState -> {
+                        PairWatchStates.InitialState -> {
                             SafeMindsPrimaryButtons(
                                 label = "Pair Watch",
                                // onClick = { states = pairWatchStates.loading; onPairClicked() }
                                 onClick = {
-                                    states = pairWatchStates.success
+                                    states = PairWatchStates.Success
                                 } //just to test delete it later
                             )
                         }
 
-                        pairWatchStates.loading -> {
+                        PairWatchStates.Loading -> {
                             SafeMindsPrimaryButtons(
                                 label = "Pairing in progress",
                                 onClick = {},
@@ -168,18 +160,18 @@ fun PairWithWatch (navController: NavHostController,
                             )
                         }
 
-                        pairWatchStates.success -> {
+                        PairWatchStates.Success -> {
                             SafeMindsPrimaryButtons(
                                 label = "Continue",
                                 onClick = onContinueClicked
                             )
                         }
 
-                        is pairWatchStates.failure -> {
+                        is PairWatchStates.Failure -> {
                             SafeMindsPrimaryButtons(
                                 label = "Try again",
                                 onClick = {
-                                    states = pairWatchStates.loading;
+                                    states = PairWatchStates.Loading;
                                     onPairClicked()
                                 }
                             )
@@ -198,7 +190,7 @@ fun PairWithWatch (navController: NavHostController,
 
 @Composable
 private fun screenVisuals(
-    states: pairWatchStates,modifier: Modifier=Modifier
+    states: PairWatchStates, modifier: Modifier=Modifier
 ){
     val shape by rememberInfiniteTransition(label = "shape")
         .animateFloat(
@@ -234,10 +226,10 @@ private fun screenVisuals(
             contentAlignment = Alignment.Center
             ){
             val (icon, tint) =when (states){
-                pairWatchStates.initialState ->Icons.Outlined.Watch to primaryColor
-                pairWatchStates.loading -> Icons.Outlined.Sync to primaryColor
-                pairWatchStates.success -> Icons.Outlined.CheckCircle to successColor
-                is pairWatchStates.failure -> Icons.Outlined.WarningAmber to highRiskColor
+                PairWatchStates.InitialState ->Icons.Outlined.Watch to primaryColor
+                PairWatchStates.Loading -> Icons.Outlined.Sync to primaryColor
+                PairWatchStates.Success -> Icons.Outlined.CheckCircle to successColor
+                is PairWatchStates.Failure -> Icons.Outlined.WarningAmber to highRiskColor
 
             }
             Icon(icon, contentDescription = null, modifier=Modifier.size(74.dp),
@@ -245,7 +237,7 @@ private fun screenVisuals(
         }
         // watch linked
         AnimatedVisibility(
-            visible = states== pairWatchStates.success,
+            visible = states== PairWatchStates.Success,
             enter = fadeIn()+ scaleIn(),
             exit = fadeOut()
         ) {
@@ -270,14 +262,14 @@ private fun screenVisuals(
 
 
 @Composable
-private fun card(states: pairWatchStates, modifier: Modifier= Modifier){
+private fun card(states: PairWatchStates, modifier: Modifier= Modifier){
     val (title, desc, accent)=when (states){
-        pairWatchStates.initialState -> Triple("Ready to connect", "Make sure WI-FI or Bluetooth is enabled and your watch is neraby",primaryColor)
-        pairWatchStates.loading -> Triple("Pairing in progress","We are linking this watch to the current SafeMinds watch",
+        PairWatchStates.InitialState -> Triple("Ready to connect", "Make sure WI-FI or Bluetooth is enabled and your watch is neraby",primaryColor)
+        PairWatchStates.Loading -> Triple("Pairing in progress","We are linking this watch to the current SafeMinds watch",
             warningColor)
 
-        pairWatchStates.success -> Triple("Paired Successfully","Your watch is now linked with your phone and start syncing data",successColor)
-       is pairWatchStates.failure -> Triple("Connection failed",states.messg,highRiskColor)
+        PairWatchStates.Success -> Triple("Paired Successfully","Your watch is now linked with your phone and start syncing data",successColor)
+       is PairWatchStates.Failure -> Triple("Connection failed",states.messg,highRiskColor)
     }
 
     Column(

@@ -1,4 +1,4 @@
-package com.example.safemindsmobile.ui.Screens.userCredentials
+package com.example.safemindsmobile.ui.screens.userCredentials
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -37,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.safemindsmobile.R
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.Buttons.SafeMindsPrimaryButtons
+import com.example.safemindsmobile.ui.components.buttons.SafeMindsPrimaryButtons
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.primaryColor
 import com.example.safemindsmobile.ui.theme.secondaryColor
