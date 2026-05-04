@@ -3,14 +3,16 @@ package com.example.safemindsmobile.ui.theme
 import androidx.compose.ui.unit.dp
 
 object Spaces {
-    val SpaceXS=4.dp
-    val SpaceS=8.dp
-    val SpaceM=16.dp
-    val SpaceL=24.dp
-    val SpaceXL=32.dp
+    val spaceXS = 4.dp
+    val spaceS = 8.dp
+    val spaceM = 16.dp
+    val spaceL = 24.dp
+    val spaceXL = 32.dp
+}
 
-    val smallAngil=8.dp
-    val MedAngil=12.dp
-    val LargeAngil=16.dp
-    val XLAngil=20.dp
+object Radius{
+    val small=8.dp
+    val medium=12.dp
+    val large=16.dp
+    val xlarge=20.dp
 }
