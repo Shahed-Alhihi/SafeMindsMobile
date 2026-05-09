@@ -12,6 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.safemindsmobile.ui.theme.SafeMindsMobileTheme
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/CoreScreensFront
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,6 +26,7 @@ class MainActivity : ComponentActivity() {
                 SafeMindsMobile()
 
             }
+
         }
     }
 
@@ -29,6 +34,10 @@ class MainActivity : ComponentActivity() {
     fun SafeMindsMobile(){
         Text("Safe Minds")
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/CoreScreensFront
 }
 
 
