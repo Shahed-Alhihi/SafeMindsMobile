@@ -46,7 +46,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.buttons.SafeMindsPrimaryButtons
+import com.example.safemindsmobile.ui.components.SafeMindsStatus
+import com.example.safemindsmobile.ui.components.StatusIndicator
+import com.example.safemindsmobile.ui.components.SafeMindsPrimaryButtons
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.highRiskColor
 import com.example.safemindsmobile.ui.theme.primaryColor
@@ -72,6 +74,7 @@ fun PairWithWatch (navController: NavHostController,
                                inclusive=true
                            }
                        }
+
                    },
 
 
@@ -181,6 +184,8 @@ fun PairWithWatch (navController: NavHostController,
                 }
             }
             Spacer(Modifier.height(Spaces.spaceS))
+            StatusIndicator(status = SafeMindsStatus.SYNC)
+
 
         }
     }
