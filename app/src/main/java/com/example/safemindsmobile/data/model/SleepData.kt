@@ -19,7 +19,7 @@ data class Day(
     val maxHours: Float=9f
 )
 
-enum class sleepRecommendationType{
+enum class SleepRecommendationType{
     LOW_RISK,
     MEDIUM_RISK,
     HIGH_RISK,
@@ -27,7 +27,7 @@ enum class sleepRecommendationType{
 }
 
 data class RecommendationContent(
-    val type:sleepRecommendationType,
+    val type:SleepRecommendationType,
     val title: String,
     val description: String
 )

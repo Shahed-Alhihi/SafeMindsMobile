@@ -35,49 +35,34 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.buttons.SafeMindsPrimaryButtons
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsStatus
+import com.example.safemindsmobile.ui.components.screensComponents.StatusIndicator
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsPrimaryButtons
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.highRiskColor
 import com.example.safemindsmobile.ui.theme.primaryColor
 import com.example.safemindsmobile.ui.theme.secondaryColor
 import com.example.safemindsmobile.ui.theme.successColor
 import com.example.safemindsmobile.ui.theme.warningColor
-
-
-sealed interface PairWatchStates{
-    data object InitialState: PairWatchStates
-    data object Loading: PairWatchStates
-    data object Success: PairWatchStates
-    data class Failure(val messg: String): PairWatchStates
-
-}
 @Composable
 fun PairWithWatch (navController: NavHostController,
                    userName: String="there",
-                   onPairClicked: ()->Unit={},
-                   onContinueClicked: ()->Unit={
-                       navController.navigate(AppScreens.Main.flow){
-                           popUpTo(AppScreens.PairWithWatch.flow){
-                               inclusive=true
-                           }
-                       }
-                   },
+                   viewModel: PairModel= viewModel()
 
 
 ) {
-    var states by remember { mutableStateOf<PairWatchStates>(PairWatchStates.InitialState) }
 
+    val state by viewModel.state.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -113,7 +98,7 @@ fun PairWithWatch (navController: NavHostController,
             Spacer(Modifier.height(Spaces.spaceXL))
 
             screenVisuals(
-                states = states,
+                state = state,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
@@ -124,7 +109,7 @@ fun PairWithWatch (navController: NavHostController,
 
             //card status
             card(
-                states = states,
+                state = state,
             )
 
             Spacer(Modifier.weight(1f))
@@ -132,55 +117,75 @@ fun PairWithWatch (navController: NavHostController,
             //button
 
             AnimatedContent(
-                targetState = states,
+                targetState = state,
                 label = "button"
 
-            ) { state ->
+            ) { currentState ->
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(Spaces.spaceS)
                 ) {
-                    when (state) {
-                        PairWatchStates.InitialState -> {
+                    when (currentState) {
+                        PairUIState.Idle -> {
                             SafeMindsPrimaryButtons(
                                 label = "Pair Watch",
                                // onClick = { states = pairWatchStates.loading; onPairClicked() }
                                 onClick = {
-                                    states = PairWatchStates.Success
-                                } //just to test delete it later
+                                   viewModel.checkConnection()
+                                }
                             )
                         }
 
-                        PairWatchStates.Loading -> {
+                        PairUIState.Checking -> {
                             SafeMindsPrimaryButtons(
-                                label = "Pairing in progress",
+                                label = "checking connection...",
                                 onClick = {},
                                 isLoading = true
                             )
                         }
 
-                        PairWatchStates.Success -> {
+                        PairUIState.Connected -> {
                             SafeMindsPrimaryButtons(
                                 label = "Continue",
-                                onClick = onContinueClicked
+                                onClick = {
+                                    navController.navigate(AppScreens.Main.flow){
+                                        popUpTo(AppScreens.PairWithWatch.flow){
+                                            inclusive=true
+                                        }
+                                    }
+                                    }
                             )
-                        }
+                                }
 
-                        is PairWatchStates.Failure -> {
+
+                       PairUIState.notConnected -> {
                             SafeMindsPrimaryButtons(
                                 label = "Try again",
                                 onClick = {
-                                    states = PairWatchStates.Loading;
-                                    onPairClicked()
+                                   viewModel.checkConnection()
                                 }
                             )
 
                         }
-                    }
-                }
+
+                        is PairUIState.Error -> {
+                            SafeMindsPrimaryButtons(
+                                label = "Try again",
+                                onClick = {
+                                    viewModel.checkConnection()
+
+                                }
+                            )
+                        }}}
             }
             Spacer(Modifier.height(Spaces.spaceS))
+            StatusIndicator(
+                status =
+                    if (state==PairUIState.Connected) SafeMindsStatus.SYNC
+            else SafeMindsStatus.NOT_SYNCED
+            )
+
 
         }
     }
@@ -190,7 +195,7 @@ fun PairWithWatch (navController: NavHostController,
 
 @Composable
 private fun screenVisuals(
-    states: PairWatchStates, modifier: Modifier=Modifier
+    state: PairUIState, modifier: Modifier=Modifier
 ){
     val shape by rememberInfiniteTransition(label = "shape")
         .animateFloat(
@@ -208,7 +213,8 @@ private fun screenVisuals(
     {
         //glow ring
         Box(
-            Modifier.size(240.dp)
+            Modifier
+                .size(240.dp)
                 .scale(shape)
                 .alpha(0.15f)
                 .background(primaryColor, CircleShape)
@@ -216,20 +222,24 @@ private fun screenVisuals(
 
         //watch card
         Box(
-            Modifier.size(190.dp)
-            .background(
-               color= MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                shape= MaterialTheme.shapes.extraLarge
-            )
-                .border(1.dp, MaterialTheme.colorScheme.surface,
-                    MaterialTheme.shapes.extraLarge),
+            Modifier
+                .size(190.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                    shape = MaterialTheme.shapes.extraLarge
+                )
+                .border(
+                    1.dp, MaterialTheme.colorScheme.surface,
+                    MaterialTheme.shapes.extraLarge
+                ),
             contentAlignment = Alignment.Center
             ){
-            val (icon, tint) =when (states){
-                PairWatchStates.InitialState ->Icons.Outlined.Watch to primaryColor
-                PairWatchStates.Loading -> Icons.Outlined.Sync to primaryColor
-                PairWatchStates.Success -> Icons.Outlined.CheckCircle to successColor
-                is PairWatchStates.Failure -> Icons.Outlined.WarningAmber to highRiskColor
+            val (icon, tint) =when (state){
+                PairUIState.Idle ->Icons.Outlined.Watch to primaryColor
+                PairUIState.Checking -> Icons.Outlined.Sync to primaryColor
+                PairUIState.Connected -> Icons.Outlined.CheckCircle to successColor
+                PairUIState.notConnected -> Icons.Outlined.WarningAmber to warningColor
+                is PairUIState.Error -> Icons.Outlined.WarningAmber to highRiskColor
 
             }
             Icon(icon, contentDescription = null, modifier=Modifier.size(74.dp),
@@ -237,14 +247,14 @@ private fun screenVisuals(
         }
         // watch linked
         AnimatedVisibility(
-            visible = states== PairWatchStates.Success,
+            visible = state== PairUIState.Connected,
             enter = fadeIn()+ scaleIn(),
             exit = fadeOut()
         ) {
             Box(
                 Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(top=200.dp)
+                    .padding(top = 200.dp)
                     .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(50))
                     .padding(horizontal = Spaces.spaceM, vertical = Spaces.spaceS)
             ){
@@ -262,26 +272,41 @@ private fun screenVisuals(
 
 
 @Composable
-private fun card(states: PairWatchStates, modifier: Modifier= Modifier){
-    val (title, desc, accent)=when (states){
-        PairWatchStates.InitialState -> Triple("Ready to connect", "Make sure WI-FI or Bluetooth is enabled and your watch is neraby",primaryColor)
-        PairWatchStates.Loading -> Triple("Pairing in progress","We are linking this watch to the current SafeMinds watch",
+private fun card(state: PairUIState, modifier: Modifier= Modifier){
+    val (title, desc, accent)=when (state){
+        PairUIState.Idle -> Triple("Ready to connect",
+            "Make sure Wi-Fi or Bluetooth is enabled and your watch is nearby"
+            ,primaryColor)
+
+
+        PairUIState.Checking -> Triple("Checking connection",
+            "We are checking if smartwatch is connected to this phone",
             warningColor)
 
-        PairWatchStates.Success -> Triple("Paired Successfully","Your watch is now linked with your phone and start syncing data",successColor)
-       is PairWatchStates.Failure -> Triple("Connection failed",states.messg,highRiskColor)
+        PairUIState.Connected -> Triple("Paired Successfully",
+            "Your watch is now linked with your phone and start syncing data",
+            successColor)
+
+        PairUIState.notConnected -> Triple("Connection failed",
+            "Please try again",warningColor)
+
+       is PairUIState.Error -> Triple("Connection failed",state.message,
+           highRiskColor)
     }
 
     Column(
         modifier=modifier
-            .fillMaxWidth().background(MaterialTheme.colorScheme.surface.copy(0.72f)
-            , MaterialTheme.shapes.large)
-            .border(1.dp,accent.copy(alpha = 0.20f), MaterialTheme.shapes.large)
+            .fillMaxWidth()
+            .background(
+                MaterialTheme.colorScheme.surface.copy(0.72f), MaterialTheme.shapes.large
+            )
+            .border(1.dp, accent.copy(alpha = 0.20f), MaterialTheme.shapes.large)
             .padding(Spaces.spaceL)
     ) {
         Box(
-            Modifier.size(width=42.dp, height = 5.dp)
-                .background(accent,CircleShape)
+            Modifier
+                .size(width = 42.dp, height = 5.dp)
+                .background(accent, CircleShape)
 
         )
         Spacer(Modifier.height(Spaces.spaceM))
@@ -308,10 +333,20 @@ private fun card(states: PairWatchStates, modifier: Modifier= Modifier){
 @Composable
 private fun screenBackground(){
     Box(Modifier.fillMaxSize()){
-        Box(Modifier.size(240.dp).padding(top=60.dp,
-            start = 30.dp).alpha(0.16f).background(secondaryColor,CircleShape))
+        Box(Modifier
+            .size(240.dp)
+            .padding(
+                top = 60.dp,
+                start = 30.dp
+            )
+            .alpha(0.16f)
+            .background(secondaryColor, CircleShape))
 
-        Box(Modifier.size(280.dp).padding(top=260.dp, start = 180.dp).alpha(0.12f).background(primaryColor,CircleShape))
+        Box(Modifier
+            .size(280.dp)
+            .padding(top = 260.dp, start = 180.dp)
+            .alpha(0.12f)
+            .background(primaryColor, CircleShape))
     }
 }
 

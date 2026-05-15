@@ -1,5 +1,6 @@
 package com.example.safemindsmobile.ui.screens.userCredentials
 
+import android.R.attr.fontWeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,10 +48,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.safemindsmobile.data.repository.SafeMindsRep
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.buttons.SafeMindsPrimaryButtons
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsPrimaryButtons
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.primaryColor
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(navController: NavHostController) {
@@ -58,6 +63,20 @@ fun SignUpScreen(navController: NavHostController) {
     var passwordVisibility by remember { mutableStateOf(false) }
     var ageRange by remember { mutableStateOf<String?>(null) }
     var gender by remember { mutableStateOf<String?>(null) }
+    var height by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+
+
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+
+    var errorMessage by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    val scope= rememberCoroutineScope()
+    val rep=remember { SafeMindsRep() }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -107,7 +126,9 @@ fun SignUpScreen(navController: NavHostController) {
 
             textField(
                 value = userName,
-                changedValue = { userName = it },
+                changedValue = { userName = it
+                               errorMessage=null
+                               },
                 label = "Username",
                 leadingIcon = {
                     Icon(
@@ -121,7 +142,9 @@ fun SignUpScreen(navController: NavHostController) {
 
             textField(
                 value = fullName,
-                changedValue = { fullName = it },
+                changedValue = { fullName = it
+                               errorMessage=null
+                               },
                 label = "Full Name",
                 leadingIcon = {
                     Icon(
@@ -136,7 +159,9 @@ fun SignUpScreen(navController: NavHostController) {
 
             textField(
                 value = password,
-                changedValue = { password = it },
+                changedValue = { password = it
+                               errorMessage=null
+                               },
                 label = "Password",
                 leadingIcon = {
                     Icon(
@@ -235,6 +260,35 @@ fun SignUpScreen(navController: NavHostController) {
                 }
             }
 
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            textField(
+                value = height,
+                changedValue = {
+                    height=it
+                    errorMessage=null
+                },
+                label = "Height (cm)",
+                keyboardType = KeyboardType.Number
+
+            )
+
+            textField(
+                value = weight,
+                changedValue = {
+                    weight=it
+                    errorMessage=null
+                },
+                label = "Weight (kg)",
+                keyboardType = KeyboardType.Number
+
+            )
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -242,20 +296,93 @@ fun SignUpScreen(navController: NavHostController) {
             ) {
                 Spacer(modifier = Modifier.height(Spaces.spaceXS))
 
+                if (isLoading){
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+                else{
+
                 SafeMindsPrimaryButtons(
                     label = "Create account",
                     onClick = {
-                        navController.navigate(AppScreens.LoginScreen.flow)
+                        if (
+                            userName.isBlank() ||
+                            fullName.isBlank() ||
+                            password.isBlank() ||
+                            ageRange == null ||
+                            gender == null ||
+                            height.isBlank()||
+                            weight.isBlank()
+
+                        ){
+                            errorMessage="Please fill all fields"
+                            return@SafeMindsPrimaryButtons
+                        }
+                        scope.launch {
+                            isLoading=true
+                            errorMessage=null
+
+                            try {
+                                val response=rep.signup(
+                                    username = userName.trim(),
+                                    fullName = fullName.trim(),
+                                    password = password,
+                                    ageRange = ageRange!!,
+                                    gender=gender!!,
+                                    height = height.toFloat(),
+                                    weight = weight.toFloat()
+
+                                )
+                                if (response.success){
+                                    navController.navigate(AppScreens.LoginScreen.flow){
+                                        popUpTo(AppScreens.SignUpScreen.flow){
+                                            inclusive=true
+                                        }
+                                    }
+
+                                }
+                                else{
+                                    errorMessage=response.message
+                                }
+                            }
+                            catch (e:Exception){
+                                errorMessage="Could not connect to the server"
+                            }
+                            finally {
+                                isLoading=false
+                            }
+                        }
                     }
                 )
 
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Already have an account?",
+                            style = MaterialTheme.typography.bodySmall,
+                            color= MaterialTheme.colorScheme.onSurfaceVariant)
+
+                        Text(
+                            text="Login",
+                            style= MaterialTheme.typography.bodySmall.copy(
+fontWeight = FontWeight.SemiBold
+                            ),
+                            color= primaryColor,
+                            modifier = Modifier.clickable{
+                                navController.navigate(AppScreens.LoginScreen.flow)
+                            }
+                        )
+                    }
                 Spacer(modifier = Modifier.height(Spaces.spaceL))
             }
         }
 
     }
 }
-
+}
 @Composable
 private fun textField(
     value: String,
@@ -312,8 +439,8 @@ private fun options(
             )
             .border(
                 width = 1.dp,
-                color = if (isSelected) primaryColor
-                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.18f),
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 shape = RoundedCornerShape(10.dp)
             )
             .clickable{onClick()}

@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,11 +37,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.safemindsmobile.R
+import com.example.safemindsmobile.data.repository.SafeMindsRep
+import com.example.safemindsmobile.data.session.UserSession
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.buttons.SafeMindsPrimaryButtons
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsPrimaryButtons
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.primaryColor
 import com.example.safemindsmobile.ui.theme.secondaryColor
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen (navController: NavController) {
@@ -49,6 +54,18 @@ var userName by remember {
     var password by remember {
         mutableStateOf("")
     }
+
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+
+    var errorMessage by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    val scope= rememberCoroutineScope()
+    val rep=remember { SafeMindsRep() }
+
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -100,12 +117,16 @@ var userName by remember {
             ) {
                 OutlinedTextField(
                     value = userName,
-                    onValueChange = {userName=it},
+                    onValueChange = {
+                        userName=it
+                        errorMessage=null
+                                    },
                     modifier = Modifier.fillMaxWidth(),
                     label = {Text("UserName")},
                     leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
                     singleLine = true,
                     shape= MaterialTheme.shapes.extraLarge,
+                    enabled = !isLoading,
                     colors= OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
@@ -117,13 +138,16 @@ var userName by remember {
 
                 OutlinedTextField(
                     value = password,
-                    onValueChange = {password=it},
+                    onValueChange = {password=it
+                        errorMessage=null
+                                    },
                     modifier = Modifier.fillMaxWidth(),
                     label = {Text("Password")},
                     leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     shape= MaterialTheme.shapes.extraLarge,
+                    enabled = !isLoading,
                     colors= OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
@@ -132,17 +156,69 @@ var userName by remember {
                     )
 
                 )
+                errorMessage?.let {
+                    Text(
+                        text=it,
+                        color = MaterialTheme.colorScheme.error,
+                        style= MaterialTheme.typography.bodySmall
+                    )
+                }
 
                 Spacer(Modifier.height(Spaces.spaceXS))
 
-                SafeMindsPrimaryButtons(
-                    label = "Login",
-                    onClick = {
-                        navController.navigate(AppScreens.PairWithWatch.flow) {
-                            popUpTo(AppScreens.LoginScreen.flow) {
-                                inclusive = true
+                if (isLoading){
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+                else{
+                    SafeMindsPrimaryButtons(
+                        label = "Login",
+                        onClick = {
+                            if (userName.isBlank()|| password.isBlank()){
+                                errorMessage="Please fill all fields"
+                                return@SafeMindsPrimaryButtons
+
                             }
-                        }
+
+                            scope.launch {
+                                isLoading=true
+                                errorMessage=null
+
+                                try {
+                                    val response=rep.login(
+                                        username =userName.trim(),
+                                        password = password
+                                    )
+
+                                    if (response.success&& response.data!=null) {
+                                        UserSession.userId = response.data.user_id
+                                        UserSession.username = response.data.username
+                                        UserSession.fullName = response.data.full_name
+
+                                        navController.navigate(AppScreens.PairWithWatch.flow) {
+                                            popUpTo(AppScreens.LoginScreen.flow) {
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
+                        else{
+                                        errorMessage=response.message
+
+                                    }
+                            }
+                                catch (e:Exception){
+                                        errorMessage="Could not connect to the server"
+                                    }
+                                finally {
+                                    isLoading=false
+                                }
+
+
+                }
+
+
+
                     }
 
                 )
@@ -151,6 +227,7 @@ var userName by remember {
         }
     }
 
+    }
 }
 
 @Composable

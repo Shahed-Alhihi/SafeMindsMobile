@@ -9,6 +9,7 @@ import com.example.safemindsmobile.data.local.entity.SyncStateEntity
 import com.example.safemindsmobile.data.model.SessionData
 import com.example.safemindsmobile.data.remote.mapper.SessionRequestMapper
 import com.example.safemindsmobile.data.remote.model.SessionRequest
+import com.example.safemindsmobile.data.repository.SafeMindsRep
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 import com.google.gson.Gson
@@ -19,10 +20,13 @@ import org.json.JSONObject
 
 class WearMessageService : WearableListenerService() {
 
+    private val repository= SafeMindsRep()
     private val gson = Gson()
     private val mapper = SessionRequestMapper()
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
+        super.onMessageReceived(messageEvent)
+
         Log.d("WearReceiver", "Message received: ${messageEvent.path}")
 
         if (messageEvent.path != "/safeminds/session-transfer") {
@@ -54,6 +58,8 @@ class WearMessageService : WearableListenerService() {
         } catch (e: Exception) {
             Log.e("WearReceiver", "Failed to parse incoming session", e)
         }
+
+
     }
 
     private suspend fun saveToDatabase(session: SessionData) {
@@ -102,7 +108,28 @@ class WearMessageService : WearableListenerService() {
         sendToBackend(request)
     }
 
-    private fun sendToBackend(request: SessionRequest) {
-        Log.d("SafeMindsMobile", "Sending to backend: $request")
+    private suspend fun sendToBackend(request: SessionRequest) {
+        try {
+            Log.d("SafeMindsMobile", "Sending to backend: $request")
+            val response=repository.ingestData(request)
+            if (response.success){
+                Log.d("SafeMindsMobile", "Session sent successfully to backend")
+                val db=AppDatabase.getInstance(applicationContext)
+                val dao=db.sessionDao()
+
+                dao.insertSyncState(
+                    SyncStateEntity(
+                        request.dataID,
+                        true
+                    )
+                )
+            }
+            else{
+                Log.e("SafeMindsMobile", "Backend rejected session: ${response.message}")
+            }
+            }
+            catch (e: Exception) {
+                Log.e("SafeMindsMobile", "Failed to send session to backend", e)
+            }
+        }
     }
-}
