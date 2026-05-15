@@ -1,4 +1,4 @@
-package com.example.safemindsmobile.ui.components
+package com.example.safemindsmobile.ui.components.screensComponents
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope

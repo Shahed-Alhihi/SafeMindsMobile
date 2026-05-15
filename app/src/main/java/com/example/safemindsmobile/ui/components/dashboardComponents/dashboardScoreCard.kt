@@ -32,8 +32,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.safemindsmobile.data.model.RiskLevel
-import com.example.safemindsmobile.ui.components.SafeMindsCard
-import com.example.safemindsmobile.ui.components.StatusContainer
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsCard
+import com.example.safemindsmobile.ui.components.screensComponents.StatusContainer
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.highRiskColor
 import com.example.safemindsmobile.ui.theme.primaryColor

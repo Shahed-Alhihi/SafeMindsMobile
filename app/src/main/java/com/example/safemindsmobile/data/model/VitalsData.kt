@@ -20,7 +20,7 @@ data class VitalsData (
         val label:String,
         val range: String,
         val min:Int,
-        val maxMin: Int
+        val max: Int
     )
 
 

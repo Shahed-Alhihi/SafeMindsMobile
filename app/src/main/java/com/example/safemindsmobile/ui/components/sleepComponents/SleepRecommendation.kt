@@ -25,8 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.example.safemindsmobile.data.model.RecommendationContent
-import com.example.safemindsmobile.data.model.sleepRecommendationType
-import com.example.safemindsmobile.ui.components.SafeMindsCard
+import com.example.safemindsmobile.data.model.SleepRecommendationType
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsCard
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.highRiskColor
 import com.example.safemindsmobile.ui.theme.primaryColor
@@ -92,11 +92,11 @@ fun SleepRecommendation (
         }
 }
 
-fun recommendationColor(type: sleepRecommendationType): Color {
+fun recommendationColor(type: SleepRecommendationType): Color {
     return when (type) {
-        sleepRecommendationType.HIGH_RISK -> highRiskColor
-        sleepRecommendationType.INFO -> primaryColor
-        sleepRecommendationType.MEDIUM_RISK -> warningColor
-        sleepRecommendationType.LOW_RISK -> successColor
+        SleepRecommendationType.HIGH_RISK -> highRiskColor
+        SleepRecommendationType.INFO -> primaryColor
+        SleepRecommendationType.MEDIUM_RISK -> warningColor
+        SleepRecommendationType.LOW_RISK -> successColor
     }
 }

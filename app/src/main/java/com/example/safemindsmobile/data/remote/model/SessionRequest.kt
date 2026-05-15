@@ -5,11 +5,12 @@ data class SessionRequest(
     val timeStamp: Long,
     val sessionType: String,
     val userID: String,
+    val sessionStart:Long,
+    val sessionEnd:Long,
     val hrMean: Float?,
     val hrMin: Float?,
     val hrMax: Float?,
     val movementMean: Float,
     val movementVariance: Float,
     val totalEpochs: Int
-
 )

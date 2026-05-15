@@ -42,7 +42,7 @@ import com.example.safemindsmobile.ui.theme.successColor
 import com.example.safemindsmobile.ui.theme.warningColor
 
 @Composable
-fun ECGcard (
+fun ECGCard (
     data: VitalsData) {
     var triggered by remember { mutableStateOf(false) }
 

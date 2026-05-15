@@ -1,5 +1,6 @@
 package com.example.safemindsmobile.ui.screens.userCredentials
 
+import android.R.attr.fontWeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -49,7 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.safemindsmobile.data.repository.SafeMindsRep
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.SafeMindsPrimaryButtons
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsPrimaryButtons
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.primaryColor
 import kotlinx.coroutines.launch
@@ -62,6 +63,9 @@ fun SignUpScreen(navController: NavHostController) {
     var passwordVisibility by remember { mutableStateOf(false) }
     var ageRange by remember { mutableStateOf<String?>(null) }
     var gender by remember { mutableStateOf<String?>(null) }
+    var height by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+
 
     var isLoading by remember {
         mutableStateOf(false)
@@ -264,6 +268,27 @@ fun SignUpScreen(navController: NavHostController) {
                 )
             }
 
+            textField(
+                value = height,
+                changedValue = {
+                    height=it
+                    errorMessage=null
+                },
+                label = "Height (cm)",
+                keyboardType = KeyboardType.Number
+
+            )
+
+            textField(
+                value = weight,
+                changedValue = {
+                    weight=it
+                    errorMessage=null
+                },
+                label = "Weight (kg)",
+                keyboardType = KeyboardType.Number
+
+            )
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -286,7 +311,9 @@ fun SignUpScreen(navController: NavHostController) {
                             fullName.isBlank() ||
                             password.isBlank() ||
                             ageRange == null ||
-                            gender == null
+                            gender == null ||
+                            height.isBlank()||
+                            weight.isBlank()
 
                         ){
                             errorMessage="Please fill all fields"
@@ -302,7 +329,10 @@ fun SignUpScreen(navController: NavHostController) {
                                     fullName = fullName.trim(),
                                     password = password,
                                     ageRange = ageRange!!,
-                                    gender=gender!!
+                                    gender=gender!!,
+                                    height = height.toFloat(),
+                                    weight = weight.toFloat()
+
                                 )
                                 if (response.success){
                                     navController.navigate(AppScreens.LoginScreen.flow){
@@ -326,6 +356,26 @@ fun SignUpScreen(navController: NavHostController) {
                     }
                 )
 
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Already have an account?",
+                            style = MaterialTheme.typography.bodySmall,
+                            color= MaterialTheme.colorScheme.onSurfaceVariant)
+
+                        Text(
+                            text="Login",
+                            style= MaterialTheme.typography.bodySmall.copy(
+fontWeight = FontWeight.SemiBold
+                            ),
+                            color= primaryColor,
+                            modifier = Modifier.clickable{
+                                navController.navigate(AppScreens.LoginScreen.flow)
+                            }
+                        )
+                    }
                 Spacer(modifier = Modifier.height(Spaces.spaceL))
             }
         }

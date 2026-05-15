@@ -1,4 +1,4 @@
-package com.example.safemindsmobile.ui.components
+package com.example.safemindsmobile.ui.components.screensComponents
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState

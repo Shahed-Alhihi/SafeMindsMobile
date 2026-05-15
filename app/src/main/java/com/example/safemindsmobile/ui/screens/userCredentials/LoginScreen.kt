@@ -40,7 +40,7 @@ import com.example.safemindsmobile.R
 import com.example.safemindsmobile.data.repository.SafeMindsRep
 import com.example.safemindsmobile.data.session.UserSession
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.SafeMindsPrimaryButtons
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsPrimaryButtons
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.primaryColor
 import com.example.safemindsmobile.ui.theme.secondaryColor

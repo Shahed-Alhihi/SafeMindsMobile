@@ -1,16 +1,4 @@
-package com.example.safemindsmobile.data.remote
-
-data class SensorDataRequest(
-    val user_id: String,
-    val session_id: String,
-    val timestamp: String,
-    val heart_rate: Int,
-    val steps: Int,
-    val sleep_hours: Float,
-    // val stress_level: Int,
-    val session_type: String="daily_check"
-)
-
+package com.example.safemindsmobile.data.remote.dto
 data class IngestResponse(
     val success: Boolean,
     val message: String,
@@ -31,14 +19,14 @@ data class CsiResultDto(
     val risk_level: String,
     val drivers:List<String>,
     val recommendations:List<String>,
-    val baseline_comparison:Map<String,String>,
+    val baseline_comparison:Map<String,Any> =emptyMap(),
     val model_version:String
 )
 
 data class CsiHistoryResponse(
     val success: Boolean,
     val message: String?=null,
-    val data:List<CsiHistoryData>?
+    val data:CsiHistoryData?
 )
 
 data class CsiHistoryData(

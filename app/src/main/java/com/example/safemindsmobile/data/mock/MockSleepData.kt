@@ -3,7 +3,7 @@ package com.example.safemindsmobile.data.mock
 import com.example.safemindsmobile.data.model.Day
 import com.example.safemindsmobile.data.model.RecommendationContent
 import com.example.safemindsmobile.data.model.SleepData
-import com.example.safemindsmobile.data.model.sleepRecommendationType
+import com.example.safemindsmobile.data.model.SleepRecommendationType
 
 
 val MockSleepData = SleepData(
@@ -23,7 +23,7 @@ val MockSleepData = SleepData(
     ),
     recommendations = listOf(
         RecommendationContent(
-            sleepRecommendationType.LOW_RISK,
+            SleepRecommendationType.LOW_RISK,
             "Keep consistent bedtime",
             "Your sleep routine is improving this week."
         )

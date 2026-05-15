@@ -4,7 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.sp
-import com.example.safemindsmobile.ui.components.SafeMindsCard
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsCard
 
 @Composable
 fun BreakdownCard (

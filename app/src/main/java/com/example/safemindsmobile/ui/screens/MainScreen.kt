@@ -12,11 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.safemindsmobile.ui.components.BottomNav
+import com.example.safemindsmobile.ui.components.screensComponents.BottomNav
 import com.example.safemindsmobile.ui.screens.RiskAnalysis.RiskAnalysisScreen
 import com.example.safemindsmobile.ui.screens.dashboard.DashboardScreen
 import com.example.safemindsmobile.ui.screens.vitals.VitalsAnalysisScreen
-import com.example.safemindsmobile.ui.viewModel.mainView
+import com.example.safemindsmobile.ui.viewModel.MainView
 import com.example.safemindsmobile.ui.components.systemStatus.stateHandler
 
 //main screen navigation
@@ -26,7 +26,7 @@ fun MainScreen (appNavController: NavController
     val controller =
         rememberNavController() // create nav controller once and save the value even after closing it
 
-    val mainView: mainView = viewModel()
+    val mainView: MainView = viewModel()
 
     val screens = listOf(
         //list of tabs that are needed in the navbar
@@ -54,33 +54,44 @@ fun MainScreen (appNavController: NavController
                 LaunchedEffect(Unit) {
                     mainView.dashboardLoading()
                 }
-                stateHandler (
-                    state=mainView.dashboardState,
-                    retry={mainView.dashboardLoading()}
-                ){
-                        dashboardData ->
+                stateHandler(
+                    state = mainView.dashboardState,
+                    retry = { mainView.dashboardLoading() }
+                ) { dashboardData ->
 
-                DashboardScreen(
-                    data = dashboardData,
-                    onLogout = {
-                        appNavController.navigate(AppScreens.LoginScreen.flow) {
-                            popUpTo(AppScreens.Main.flow) {
-                                inclusive = true
+                    DashboardScreen(
+                        data = dashboardData,
+                        onLogout = {
+                            appNavController.navigate(AppScreens.LoginScreen.flow) {
+                                popUpTo(AppScreens.Main.flow) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+
                             }
-                            launchSingleTop = true
-
+                        },
+                        onSleepAnalysis = {
+                            controller.navigate(AppScreens.SleepPatternsScreen.flow){
+                                popUpTo(controller.graph.startDestinationId){
+                                    saveState=true
+                                }
+                                launchSingleTop=true
+                                restoreState=true
+                            }
+                        },
+                        onVitalsAnalysis = {
+                            controller.navigate(AppScreens.VitalsAnalysisScreen.flow){
+                                popUpTo(controller.graph.startDestinationId){
+                                    saveState=true
+                                }
+                                launchSingleTop=true
+                                restoreState=true
+                            }
                         }
-                    },
-                    onSleepAnalysis = {
-                        controller.navigate(AppScreens.SleepPatternsScreen.flow)
-                    },
-                    onVitalsAnalysis = {
-                        controller.navigate(AppScreens.VitalsAnalysisScreen.flow)
-                    }
-                )
-            }
-
+                    )
                 }
+
+            }
 
 
 
@@ -92,12 +103,12 @@ fun MainScreen (appNavController: NavController
                 stateHandler(
                     state = mainView.sleepState,
                     retry = { mainView.sleepLoading() }
-                ) { sleepData ->
+                ) {
                     SleepAnalysisScreen(
-                        data = sleepData,
-                        navController = appNavController
+                        navController = controller
                     )
-                }}
+                }
+            }
 
 
 
@@ -109,34 +120,19 @@ fun MainScreen (appNavController: NavController
                 stateHandler(
                     state = mainView.vitalsState,
                     retry = { mainView.vitalsLoading() }
-                ) { vitalsData ->
+                ) {
                     VitalsAnalysisScreen(
-                        data = vitalsData,
-                        navController = appNavController
+                        navController = controller
                     )
-                }}
+                }
+            }
 
             composable(AppScreens.RiskAnalysisScreen.flow) {
                 RiskAnalysisScreen(
-                    navController =appNavController
+                    navController = controller
                 )
             }
 
-//            composable(AppScreens.RiskAnalysisScreen.flow) {
-//                LaunchedEffect(Unit) {
-//                    mainView.riskLoading()
-//                }
-//
-//                stateHandler(
-//                    state = mainView.riskState,
-//                    retry = { mainView.riskLoading() }
-//                ) {
-//                RiskAnalysisScreen(
-//                    navController = appNavController)
-//            }}
-
-        }
-    }
-}
+        }}}
 
 

@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.safemindsmobile.data.model.RiskData
-import com.example.safemindsmobile.ui.components.SafeMindsCard
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsCard
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.highRiskColor
 import com.example.safemindsmobile.ui.theme.successColor

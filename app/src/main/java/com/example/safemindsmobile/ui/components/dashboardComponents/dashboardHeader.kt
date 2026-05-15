@@ -18,14 +18,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.safemindsmobile.R
-import com.example.safemindsmobile.ui.components.SafeMindsStatus
-import com.example.safemindsmobile.ui.components.StatusIndicator
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsStatus
+import com.example.safemindsmobile.ui.components.screensComponents.StatusIndicator
 import com.example.safemindsmobile.ui.theme.Spaces
 
 @Composable
 fun dashboardHeader (
     onLogout:()->Unit,
-){
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -66,17 +66,23 @@ fun dashboardHeader (
 
             }
         }
-        TextButton(onClick = {
-            onLogout()
-        }) {
-            Text(
-                text = "Logout",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spaces.spaceS)
+        ) {
             StatusIndicator(status = SafeMindsStatus.SYNC)
+
+            TextButton(
+                onClick = {
+                    onLogout()
+                }
+            ) {
+                Text(
+                    text = "Logout",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

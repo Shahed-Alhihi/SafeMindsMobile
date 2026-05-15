@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.example.safemindsmobile.data.model.RecommendationType
 import com.example.safemindsmobile.data.model.Recommendations
-import com.example.safemindsmobile.ui.components.SafeMindsCard
+import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsCard
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.highRiskColor
 import com.example.safemindsmobile.ui.theme.primaryColor

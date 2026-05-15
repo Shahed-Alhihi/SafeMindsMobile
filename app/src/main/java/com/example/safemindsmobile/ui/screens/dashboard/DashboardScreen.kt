@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.safemindsmobile.data.model.RecommendationType
-import com.example.safemindsmobile.data.model.dashboardData
-import com.example.safemindsmobile.ui.components.SectionHeader
+import com.example.safemindsmobile.data.model.DashboardData
+import com.example.safemindsmobile.ui.components.screensComponents.SectionHeader
 import com.example.safemindsmobile.ui.components.dashboardComponents.dashboardActivityChart
 import com.example.safemindsmobile.ui.components.dashboardComponents.dashboardHeader
 import com.example.safemindsmobile.ui.components.dashboardComponents.dashboardHeartRateChart
@@ -27,7 +27,7 @@ import com.example.safemindsmobile.ui.theme.warningColor
 
 @Composable
 fun DashboardScreen (
-    data: dashboardData,
+    data: DashboardData,
     onLogout:()->Unit,
     onSleepAnalysis:()->Unit,
     onVitalsAnalysis:()->Unit,

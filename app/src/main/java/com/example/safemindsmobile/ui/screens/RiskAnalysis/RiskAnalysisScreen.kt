@@ -17,11 +17,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.safemindsmobile.navigation.AppScreens
-import com.example.safemindsmobile.ui.components.SectionHeader
+import com.example.safemindsmobile.ui.components.screensComponents.SectionHeader
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.data.model.RiskData
 import com.example.safemindsmobile.data.session.UserSession
@@ -30,22 +29,27 @@ import com.example.safemindsmobile.ui.components.riskComponents.RiskHeader
 import com.example.safemindsmobile.ui.components.riskComponents.RiskReasonsCard
 import com.example.safemindsmobile.ui.components.riskComponents.RiskRecommendation
 import com.example.safemindsmobile.ui.components.riskComponents.RiskScoreCard
-
+import androidx.compose.ui.platform.LocalContext
+import com.example.safemindsmobile.data.model.RiskLevel
+import com.example.safemindsmobile.ui.states.UIStates
+import com.example.safemindsmobile.ui.viewModel.MainView
+import com.example.safemindsmobile.utils.NotificationHelper
 
 @Composable
 fun RiskAnalysisScreen (
-    vm: RiskViewModel= viewModel(),
+    viewModel: MainView= viewModel(),
    // data: RiskData,
     navController: NavController
 ){
-    val state by vm.state.collectAsState()
+    val state=viewModel.riskState
+    val context=LocalContext.current
 
     LaunchedEffect(Unit) {
-        vm.loadRisk(UserSession.userId)
+        viewModel.riskLoading()
     }
 
     when(val currentState=state) {
-        is RiskUIState.Loading -> {
+        is UIStates.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -55,7 +59,7 @@ fun RiskAnalysisScreen (
             }
         }
 
-        is RiskUIState.Error -> {
+        is UIStates.Error -> {
             Box(
                 modifier = Modifier.fillMaxSize()
                     .padding(Spaces.spaceL),
@@ -70,17 +74,45 @@ fun RiskAnalysisScreen (
             }
         }
 
-        is RiskUIState.Success -> {
+        is UIStates.Success -> {
+            val data = currentState.data
+            HighRiskNotificationEffect(
+                data = data,
+                context = context
+            )
+
             RiskContent(
-                data = currentState.data,
+                data = data,
                 navController = navController
             )
         }
 
-
+        UIStates.Empty -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text="No data available",
+                    style=MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
     }}
 
-
+@Composable
+private fun HighRiskNotificationEffect(
+    data: RiskData,
+    context:android.content.Context
+){
+    LaunchedEffect(data.riskScore,data.riskLevel) {
+        if(data.riskLevel==RiskLevel.HIGH){
+            NotificationHelper.showHighRiskNotification(
+                context=context,
+                title="High risk alert!",
+                score=data.riskScore
+            )
+}}}
 
 @Composable
 private fun RiskContent(
@@ -127,3 +159,10 @@ private fun RiskContent(
 }
 
 
+/*
+LOW → no notification
+MEDIUM → no notification or optional gentle reminder
+HIGH → notification
+
+This notification only appears when the app loads the Risk page and receives HIGH risk.
+ */

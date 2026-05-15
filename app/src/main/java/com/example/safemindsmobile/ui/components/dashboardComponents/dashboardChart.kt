@@ -26,10 +26,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.safemindsmobile.data.model.dashboardActivitySummary
-import com.example.safemindsmobile.data.model.dashboardHeartRateSummary
-import com.example.safemindsmobile.data.model.dashboardSleepSummary
-import com.example.safemindsmobile.ui.components.ChartCards
+import com.example.safemindsmobile.data.model.DashboardActivitySummary
+import com.example.safemindsmobile.data.model.DashboardHeartRateSummary
+import com.example.safemindsmobile.data.model.DashboardSleepSummary
+import com.example.safemindsmobile.ui.components.screensComponents.ChartCards
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.theme.highRiskColor
 import com.example.safemindsmobile.ui.theme.primaryColor
@@ -37,9 +37,8 @@ import com.example.safemindsmobile.ui.theme.successColor
 
 @Composable
  fun dashboardSleepChart(
-    data: dashboardSleepSummary
+    data: DashboardSleepSummary
 ) {
-    Text(text = "Your sleep chart here!")
     metricChart(
         label = "Weekly sleep overview",
         value = data.avgSleep,
@@ -56,13 +55,12 @@ import com.example.safemindsmobile.ui.theme.successColor
 
 @Composable
 fun dashboardActivityChart(
-    data: dashboardActivitySummary
+    data: DashboardActivitySummary
 ) {
-    Text(text = "Your activity chart here!")
     metricChart(
-        label = "Daily activity",
-        value = data.steps,
-        subTitle = data.subtitle
+        label = "Activity level",
+        value = data.activityLevel.toString(),
+        subTitle = "Based on movement data"
     ) {
         screenProgressBar(
             progress = data.progress,
@@ -72,7 +70,7 @@ fun dashboardActivityChart(
         Spacer(modifier = Modifier.height(Spaces.spaceM))
 
         screenLineChart(
-            points = data.values,
+            points = data.activityChart,
             color = primaryColor
         )
 
@@ -81,16 +79,16 @@ fun dashboardActivityChart(
 
 @Composable
 fun dashboardHeartRateChart(
-    data: dashboardHeartRateSummary
+    data: DashboardHeartRateSummary
 ) {
-    Text(text = "Your heart rate chart here!")
     metricChart(
         label = "Heart rate",
-        value = data.heartRate,
-        subTitle = data.subtitle
+        value = "${data.averageHr.toInt()} bpm",
+        subTitle = "Latest heart rate summary"
     ) {
+        if(data.heartRateChart.isNotEmpty())
         screenLineChart(
-            points = data.values,
+            points = data.heartRateChart,
             color = highRiskColor
         )
     }
@@ -117,10 +115,16 @@ private fun screenLineChart(
         if (points.size<2) return@Canvas
 
         val eachStep=size.width/(points.size-1)
+       val minValue=points.minOrNull() ?:0f
+        val maxValue=points.maxOrNull() ?:1f
+        val range=(maxValue-minValue).takeIf { it!= 0f } ?: 1f
+
         val lineChartPoints=points.mapIndexed { index, data ->
+            val normalized=(data-minValue)/ range
+
             Offset(
-                x=index*eachStep,
-                y=size.height*(1f-data)
+                x=index *eachStep,
+                y=size.height * (1f - normalized)
             )
         }
 
