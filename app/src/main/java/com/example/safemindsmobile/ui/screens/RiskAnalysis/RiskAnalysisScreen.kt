@@ -13,8 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,7 +21,6 @@ import com.example.safemindsmobile.navigation.AppScreens
 import com.example.safemindsmobile.ui.components.screensComponents.SectionHeader
 import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.data.model.RiskData
-import com.example.safemindsmobile.data.session.UserSession
 import com.example.safemindsmobile.ui.components.riskComponents.BreakdownCard
 import com.example.safemindsmobile.ui.components.riskComponents.RiskHeader
 import com.example.safemindsmobile.ui.components.riskComponents.RiskReasonsCard

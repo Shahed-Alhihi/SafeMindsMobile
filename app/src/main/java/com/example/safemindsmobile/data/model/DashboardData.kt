@@ -49,9 +49,6 @@ data class DashboardHeartRateSummary(
     @SerializedName("heart_rate_chart")
     val heartRateChart: List<Float> = emptyList()
 
-    //val heartRate: String,
-    //val subtitle: String,
-    //val values: List<Float>
 )
 
 
