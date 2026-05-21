@@ -105,13 +105,6 @@ fun SleepDto.toSleepData(): SleepData {
 }
 
 
-
-
-
-
-
-
-
 fun VitalsDto.toVitalsData(): VitalsData {
     return VitalsData(
         averageHR = average_hr.toInt(),

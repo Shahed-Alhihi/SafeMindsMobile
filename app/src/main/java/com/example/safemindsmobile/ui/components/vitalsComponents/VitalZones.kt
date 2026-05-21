@@ -8,11 +8,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -21,10 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.example.safemindsmobile.data.model.HRZone
 import com.example.safemindsmobile.ui.components.screensComponents.SafeMindsCard
 import com.example.safemindsmobile.ui.theme.Spaces
-import com.example.safemindsmobile.ui.theme.highRiskColor
-import com.example.safemindsmobile.ui.theme.primaryColor
-import com.example.safemindsmobile.ui.theme.successColor
-import com.example.safemindsmobile.ui.theme.warningColor
+
 
 @Composable
 fun VitalZones(

@@ -1,6 +1,5 @@
 package com.example.safemindsmobile.ui.screens.userCredentials
 
-import android.R.attr.fontWeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
