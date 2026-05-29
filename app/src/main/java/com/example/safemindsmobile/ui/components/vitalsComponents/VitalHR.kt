@@ -38,7 +38,12 @@ import com.example.safemindsmobile.ui.theme.successColor
 
 
 @Composable
-fun VitalHR (days: List<DailyHR>) {
+fun VitalHR(
+    days: List<DailyHR>,
+    avgHr: Int,
+    minHr: Int,
+    maxHr: Int
+) {
     var triggered by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -48,17 +53,17 @@ fun VitalHR (days: List<DailyHR>) {
     SafeMindsCard {
         Row(
             modifier = Modifier
-                .fillMaxWidth().padding(bottom = Spaces.spaceM),
+                .fillMaxWidth()
+                .padding(bottom = Spaces.spaceM),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             listOf(
-                Triple("71", "Avg", MaterialTheme.colorScheme.onSurface),
-                Triple("57", "Min", successColor),
-                Triple("124", "Max", highRiskColor)
+                Triple(avgHr.toString(), "Avg", MaterialTheme.colorScheme.onSurface),
+                Triple(minHr.toString(), "Min", successColor),
+                Triple(maxHr.toString(), "Max", highRiskColor)
             ).forEach { (value, label, color) ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
-
                 ) {
                     Text(
                         text = value,
@@ -74,16 +79,13 @@ fun VitalHR (days: List<DailyHR>) {
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
-
                 }
-
             }
         }
 
-
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(60.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.Bottom
@@ -95,9 +97,9 @@ fun VitalHR (days: List<DailyHR>) {
                     label = "HRBar$index"
                 )
 
-
                 Box(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .fillMaxHeight(bar)
                         .clip(
                             RoundedCornerShape(

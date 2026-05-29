@@ -32,11 +32,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.safemindsmobile.R
+import com.example.safemindsmobile.data.local.UserSessionManager
 import com.example.safemindsmobile.data.repository.SafeMindsRep
 import com.example.safemindsmobile.data.session.UserSession
 import com.example.safemindsmobile.navigation.AppScreens
@@ -65,6 +67,11 @@ var userName by remember {
 
     val scope= rememberCoroutineScope()
     val rep=remember { SafeMindsRep() }
+
+    val context = LocalContext.current
+    val userSessionManager = remember {
+        UserSessionManager(context)
+    }
 
 
     Box(
@@ -186,25 +193,25 @@ var userName by remember {
                                 errorMessage=null
 
                                 try {
-                                    val response=rep.login(
-                                        username =userName.trim(),
+                                    val response = rep.login(
+                                        username = userName.trim(),
                                         password = password
                                     )
 
-                                    if (response.success&& response.data!=null) {
+                                    if (response.success && response.data != null) {
                                         UserSession.userId = response.data.user_id
                                         UserSession.username = response.data.username
                                         UserSession.fullName = response.data.full_name
+
+                                        userSessionManager.saveUserId(response.data.user_id)
 
                                         navController.navigate(AppScreens.PairWithWatch.flow) {
                                             popUpTo(AppScreens.LoginScreen.flow) {
                                                 inclusive = true
                                             }
                                         }
-                                    }
-                        else{
-                                        errorMessage=response.message
-
+                                    } else {
+                                        errorMessage = response.message
                                     }
                             }
                                 catch (e:Exception){

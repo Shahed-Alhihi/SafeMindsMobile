@@ -10,6 +10,7 @@ import com.example.safemindsmobile.data.local.entity.SyncStateEntity
 
 @Dao
 interface SessionDao {
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertSleep(session: SleepSummaryEntity)
 
@@ -19,6 +20,30 @@ interface SessionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSyncState(state: SyncStateEntity)
 
-    @Query("SELECT EXISTS(SELECT 1 FROM sleep_summaries WHERE dataId = :id)")
-    suspend fun exists(id: String): Boolean
+    @Query("SELECT * FROM sync_state WHERE synced = 0")
+    suspend fun getUnsyncedSessions(): List<SyncStateEntity>
+
+    @Query("""
+        UPDATE sync_state 
+        SET synced = 1, lastError = NULL, updatedAt = :updatedAt 
+        WHERE dataID = :dataID
+    """)
+    suspend fun markSynced(dataID: String, updatedAt: Long = System.currentTimeMillis())
+
+    @Query("""
+        UPDATE sync_state 
+        SET synced = 0, lastError = :error, updatedAt = :updatedAt 
+        WHERE dataID = :dataID
+    """)
+    suspend fun markFailed(
+        dataID: String,
+        error: String?,
+        updatedAt: Long = System.currentTimeMillis()
+    )
+
+    @Query("SELECT EXISTS(SELECT 1 FROM sleep_summaries WHERE dataID = :id)")
+    suspend fun existsSleep(id: String): Boolean
+
+    @Query("SELECT EXISTS(SELECT 1 FROM hourly_checks WHERE dataID = :id)")
+    suspend fun existsHourly(id: String): Boolean
 }

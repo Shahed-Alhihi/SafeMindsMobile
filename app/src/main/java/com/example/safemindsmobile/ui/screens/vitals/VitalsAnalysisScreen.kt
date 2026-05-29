@@ -130,7 +130,11 @@ private fun vitalsContent(
         )
 
         VitalHR(
-            days=data.weeklyHR)
+            days = data.weeklyHR,
+            avgHr = data.averageHR,
+            minHr = data.restingHR,
+            maxHr = data.peakHR
+        )
         SectionHeader(
             label="Recommendations",
             action = "",
