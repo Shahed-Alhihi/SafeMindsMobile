@@ -2,6 +2,7 @@ package com.example.safemindsmobile.data.receiver
 
 import android.util.Base64
 import android.util.Log
+import com.example.safemindsmobile.data.local.UserSessionManager
 import com.example.safemindsmobile.data.local.database.AppDatabase
 import com.example.safemindsmobile.data.local.entity.HourlyCheckEntity
 import com.example.safemindsmobile.data.local.entity.SleepSummaryEntity
@@ -17,6 +18,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import com.example.safemindsmobile.data.sync.BackendSyncScheduler
+import com.example.safemindsmobile.utils.NotificationHelper
 
 class WearMessageService : WearableListenerService() {
 
@@ -66,7 +69,12 @@ class WearMessageService : WearableListenerService() {
         val db = AppDatabase.getInstance(applicationContext)
         val dao = db.sessionDao()
 
-        val userId = session.userId ?: "unknown_user"
+        val userId = UserSessionManager(applicationContext).getUserId()
+
+        if (userId == null) {
+            Log.e("WearReceiver", "Cannot sync session: no logged-in user ID found")
+            return
+        }
 
         if (session.sessionType == "NIGHT_SESSION") {
             val entity = SleepSummaryEntity(
@@ -97,39 +105,56 @@ class WearMessageService : WearableListenerService() {
             Log.d("WearReceiver", "Saved hourly session to DB")
         }
 
+        val request = mapper.map(session, userId)
+        val payloadJson = gson.toJson(request)
+
         dao.insertSyncState(
             SyncStateEntity(
-                session.sessionId,
-                false
+                dataID = session.sessionId,
+                synced = false,
+                payloadJson = payloadJson
             )
         )
 
-        val request = mapper.map(session)
         sendToBackend(request)
     }
 
     private suspend fun sendToBackend(request: SessionRequest) {
-        try {
-            Log.d("SafeMindsMobile", "Sending to backend: $request")
-            val response=repository.ingestData(request)
-            if (response.success){
-                Log.d("SafeMindsMobile", "Session sent successfully to backend")
-                val db=AppDatabase.getInstance(applicationContext)
-                val dao=db.sessionDao()
+        val db = AppDatabase.getInstance(applicationContext)
+        val dao = db.sessionDao()
 
-                dao.insertSyncState(
-                    SyncStateEntity(
-                        request.dataID,
-                        true
+        try {
+            Log.d("SafeMindsMobile", "Sending to backend JSON: ${gson.toJson(request)}")
+
+            val response = repository.ingestData(request)
+
+            Log.d("SafeMindsMobile", "Backend ingest response JSON: ${gson.toJson(response)}")
+
+            if (response.success) {
+                Log.d("SafeMindsMobile", "Session sent successfully to backend")
+
+                val riskLevel = response.csi?.risk_level?.uppercase()
+                val csiScore = response.csi?.csi_score ?: 0
+
+                if (riskLevel == "HIGH") {
+                    NotificationHelper.showHighRiskNotification(
+                        context = applicationContext,
+                        title = "High risk alert!",
+                        score = csiScore
                     )
-                )
-            }
-            else{
+                }
+
+                dao.markSynced(request.dataID)
+            } else {
                 Log.e("SafeMindsMobile", "Backend rejected session: ${response.message}")
+                dao.markFailed(request.dataID, response.message)
+                BackendSyncScheduler.schedule(applicationContext)
             }
-            }
-            catch (e: Exception) {
-                Log.e("SafeMindsMobile", "Failed to send session to backend", e)
-            }
+
+        } catch (e: Exception) {
+            Log.e("SafeMindsMobile", "Failed to send session to backend", e)
+            dao.markFailed(request.dataID, e.message)
+            BackendSyncScheduler.schedule(applicationContext)
         }
+    }
     }

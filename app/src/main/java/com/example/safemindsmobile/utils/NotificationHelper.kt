@@ -38,24 +38,21 @@ object NotificationHelper {
             ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS
-            )!=
-            PackageManager.PERMISSION_GRANTED
-        ){
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             return
         }
 
-        val notification= NotificationCompat
+        val notification = NotificationCompat
             .Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.logo)
-            .setContentTitle("High risk alert!")
-            .setContentText("Your latest CSI score is $score.Please review your risk analysis")
+            .setContentTitle(title)
+            .setContentText("Your latest CSI score is $score. Please review your risk analysis.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()
 
         NotificationManagerCompat.from(context).notify(1001, notification)
-
-
     }
 
 

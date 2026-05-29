@@ -9,7 +9,7 @@ class WearConnection (
 ){
     companion object{
         //change it to false for real watch
-        private const val TEST=true
+        private const val TEST=false
     }
     suspend fun isWatchConnected(): Boolean{
         if (TEST){
