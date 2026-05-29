@@ -103,9 +103,10 @@ fun MainScreen (appNavController: NavController
                 stateHandler(
                     state = mainView.sleepState,
                     retry = { mainView.sleepLoading() }
-                ) {
+                ) { sleepData ->
                     SleepAnalysisScreen(
-                        navController = controller
+                        navController = controller,
+                        data = sleepData
                     )
                 }
             }

@@ -28,69 +28,16 @@ import com.example.safemindsmobile.ui.theme.Spaces
 import com.example.safemindsmobile.ui.viewModel.MainView
 
 @Composable
-fun SleepAnalysisScreen (
-   // data: SleepData
 
+fun SleepAnalysisScreen(
     navController: NavController,
-    mainViewModel: MainView = viewModel()
-){
-    val state=mainViewModel.sleepState
-
-    LaunchedEffect(Unit) {
-        mainViewModel.sleepLoading()
-    }
-
-    when(val currentState=state){
-        is UIStates.Loading ->{
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ){
-                CircularProgressIndicator()
-            }
-        }
-
-        is UIStates.Error ->{
-            Box(
-                modifier = Modifier.fillMaxSize()
-                    .padding(Spaces.spaceL),
-                contentAlignment = Alignment.Center
-            ){
-                Text(
-                    text=currentState.message,
-                    color= MaterialTheme.colorScheme.error,
-                    style= MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-
-        is UIStates.Success ->{
-            sleepContent(
-                data=currentState.data,
-                navController=navController
-            )
-
-        }
-
-        UIStates.Empty ->{
-            Box(
-                modifier = Modifier.fillMaxSize()
-                    .padding(Spaces.spaceL),
-                contentAlignment = Alignment.Center
-            ){
-                Text(
-                    text="No sleep data available",
-                    style= MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-
-    }
-
+    data: SleepData
+) {
+    sleepContent(
+        data = data,
+        navController = navController
+    )
 }
-
-
-
 
 @Composable
 private fun sleepContent(
@@ -129,9 +76,17 @@ private fun sleepContent(
             click = {}
         )
 
-        SleepPatternCard(
-            weekData = data.weekData
-        )
+        if (data.weekData.isEmpty()) {
+            Text(
+                text = "No sleep pattern data available yet.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        } else {
+            SleepPatternCard(
+                weekData = data.weekData
+            )
+        }
 
         SectionHeader(
             label = "Sleep recommendations",
@@ -139,11 +94,18 @@ private fun sleepContent(
             click = {}
         )
 
-        data.recommendations.forEach{
-                recommendation ->
-            SleepRecommendation(
-                recommendation=recommendation
+        if (data.recommendations.isEmpty()) {
+            Text(
+                text = "No sleep recommendations available yet.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        } else {
+            data.recommendations.forEach { recommendation ->
+                SleepRecommendation(
+                    recommendation = recommendation
+                )
+            }
         }
 
     }

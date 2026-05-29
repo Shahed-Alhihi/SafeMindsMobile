@@ -110,10 +110,7 @@ suspend fun getVitals(userId: String): VitalsData? {
     }
 
 
-    fun getDashboardData() = MockDashboardData
-    fun getSleepData() = MockSleepData
-    fun getVitalsData() = MockVitalData
-    fun getRiskData()= MockRiskData
+
 }
 
 
